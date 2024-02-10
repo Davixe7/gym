@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\MemberController;
+use App\Models\Member;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +16,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::resource('members', MemberController::class);
