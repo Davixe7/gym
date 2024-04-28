@@ -12,8 +12,8 @@
       </q-toolbar>
     </q-header>
 
-    <q-page-container>
-      <q-page class="q-pa-md">
+    <q-page-container style="background: #f6f9fc;">
+      <q-page>
         <slot></slot>
       </q-page>
     </q-page-container>
@@ -22,3 +22,9 @@
 </template>
 
 <script setup></script>
+
+<style lang="scss">
+.q-toolbar {
+  min-height: 56px !important;
+}
+</style>

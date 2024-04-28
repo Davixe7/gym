@@ -13,7 +13,7 @@ class Member extends Model implements HasMedia
     use HasFactory;
 
     protected $guarded = ['id'];
-    protected $appends = ['picture'];
+    protected $appends = ['picture', 'subscription'];
 
     public function registerMediaCollections(): void
     {
@@ -26,5 +26,13 @@ class Member extends Model implements HasMedia
       return $this->hasMedia('picture')
              ? $this->getFirstMediaUrl('picture')
              : null;
+    }
+
+    public function subscriptions(){
+      return $this->hasMany(Subscription::class);
+    }
+
+    public function getSubscriptionAttribute(){
+      return $this->subscriptions()->latest()->with('membership')->first();
     }
 }

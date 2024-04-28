@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Member;
+use App\Models\Membership;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -11,11 +12,13 @@ class MemberController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-      $members = Member::all();
-      $member  = null;
-      return Inertia::render('App', compact('members', 'member'));
+      return Inertia::render('App', [
+        'members'       => fn() => Member::with('subscriptions.membership')->get(),
+        'updatedMember' => Inertia::lazy(fn() => $request->filled('updated_id') ? Member::with('subscriptions.membership')->find($request->updated_id) : null),
+        'createdMember' => Inertia::lazy(fn() => $request->filled('created_id') ? Member::with('subscriptions.membership')->find($request->created_id) : null),
+      ]);
     }
 
     /**
@@ -32,8 +35,9 @@ class MemberController extends Controller
     public function store(Request $request)
     {
       $request->validate([
-        'name' => 'required',
-        'dni'  => 'required|unique:members'
+        'picture' => 'required|file|max:5000|mimes:jpeg,png',
+        'name'    => 'required',
+        'dni'     => 'required|unique:members'
       ]);
 
       $member = Member::create($request->all());
@@ -42,7 +46,7 @@ class MemberController extends Controller
         $member->addMediaFromRequest('picture')->toMediaCollection('picture');
       }
 
-      return to_route('members.index');
+      return redirect()->route('members.index', ['created_id' => $member->id]);
     }
 
     /**
@@ -70,7 +74,7 @@ class MemberController extends Controller
       if( $request->hasFile('picture') ){
         $member->addMediaFromRequest('picture')->toMediaCollection('picture');
       }
-      return to_route('members.index');
+      return to_route('members.index', ['updated_id' => $member->id]);
     }
 
     /**
@@ -79,5 +83,16 @@ class MemberController extends Controller
     public function destroy(Member $member)
     {
         //
+    }
+
+    public function subscribe(Request $request, Member $member){
+      $request->validate(['membership_id'=>'required']);
+      $membership = Membership::findOrFail($request->membership_id);
+      $subscription = $member->subscriptions()->create([
+        'membership_id' => $membership->id,
+        'member_id'     => $member->id,
+        'expires_at'    => now()->addMonth()
+      ]);
+      return to_route('members.index', ['updated_id' => $member->id]);
     }
 }

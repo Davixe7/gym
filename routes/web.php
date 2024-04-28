@@ -17,3 +17,4 @@ use Inertia\Inertia;
 */
 
 Route::resource('members', MemberController::class);
+Route::post('members/{member}/subscribe', [MemberController::class, 'subscribe']);

@@ -12,6 +12,7 @@ const columns = [
 
 <template>
   <q-table
+    flat
     :title="'Miembros'"
     :columns="columns"
     :rows="props.members">
@@ -26,8 +27,14 @@ const columns = [
 
     <template v-slot:body-cell-opts="props">
       <q-td class="text-right">
-        <q-btn flat round icon="sym_o_edit" @click="emit('selected', {...props.row})"></q-btn>
+        <q-btn flat round icon="sym_o_edit" @click="emit('selected', props.row)"></q-btn>
       </q-td>
     </template>
   </q-table>
 </template>
+
+<style>
+.q-table__card {
+  background: none;
+}
+</style>
